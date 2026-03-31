@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+
+contract SuperiorERC20 is ERC20, Ownable, ReentrancyGuard, ERC20Burnable, ERC20Permit {
+    uint256 private constant _maxSupply = 100_000_000 * 10 ** 18;
+    bool private _mintingFinished;
+
+    error MintingFinished();
+    error ExceedsMaxSupply();
+    error TransferToZeroAddress();
+
+    constructor(
+        string memory name_,
+        string memory symbol_
+    )
+        ERC20(name_, symbol_)
+        Ownable(msg.sender)
+        ERC20Permit(name_)
+    {
+        _mint(msg.sender, 21_000_000 * 10 ** decimals());
+    }
+
+    function mint(address to, uint256 amount) external onlyOwner nonReentrant {
+        if (_mintingFinished) revert MintingFinished();
+        if (totalSupply() + amount > _maxSupply) revert ExceedsMaxSupply();
+        if (to == address(0)) revert TransferToZeroAddress();
+
+        _mint(to, amount);
+    }
+
+    function finishMinting() external onlyOwner {
+        _mintingFinished = true;
+    }
+
+    function maxSupply() public pure returns (uint256) {
+        return _maxSupply;
+    }
+
+    function mintingFinished() public view returns (bool) {
+        return _mintingFinished;
+    }
+
+    function _update(address from, address to, uint256 value) internal override {
+        if (to == address(0)) revert TransferToZeroAddress();
+        super._update(from, to, value);
+    }
+}
