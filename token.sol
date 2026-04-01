@@ -41,6 +41,7 @@ contract PremiumERC20 is ERC20, Ownable, ReentrancyGuard, ERC20Burnable, ERC20Pe
         emit MintPermanentlyDisabled();
     }
 
+
     function _mint(address account, uint256 amount) internal override(ERC20, ERC20Capped) {
         super._mint(account, amount);
     }
