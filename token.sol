@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
 
+
 contract PremiumERC20 is ERC20, Ownable, ReentrancyGuard, ERC20Burnable, ERC20Permit, ERC20Capped {
     bool public mintDisabled;
     address public immutable fundWallet;
